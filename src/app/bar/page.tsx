@@ -26,7 +26,7 @@ interface Order {
   tableNumber: number
   barItems: OrderItem[]
   barStatus: string
-  createdAt: Date
+  createdAt: Date | null
 }
 
 export default function BarDashboard() {
@@ -52,7 +52,8 @@ export default function BarDashboard() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
       } as Order))
       setOrders(ordersData)
     })
@@ -130,7 +131,7 @@ export default function BarDashboard() {
                     <span>Table {order.tableNumber}</span>
                   </div>
                   <span className="text-sm font-normal text-gray-500">
-                  {order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString() : 'Invalid Date'}
+                  {order.createdAt ? order.createdAt.toLocaleString() : 'Invalid Date'}
                   </span>
                 </CardTitle>
                 <CardTitle className="flex justify-between items-center">

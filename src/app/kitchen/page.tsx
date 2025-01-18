@@ -26,7 +26,7 @@ interface Order {
   customerName: string
   kitchenItems: OrderItem[]
   kitchenStatus: string
-  createdAt: Date
+  createdAt: Date | null
 }
 
 export default function KitchenDashboard() {
@@ -52,7 +52,8 @@ export default function KitchenDashboard() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
       } as Order))
       setOrders(ordersData)
     })
@@ -121,7 +122,7 @@ export default function KitchenDashboard() {
                     <span>Table {order.tableNumber}</span>
                   </div>
                   <span className="text-sm font-normal text-gray-500">
-                  {order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString() : 'Invalid Date'}
+                  {order.createdAt ? order.createdAt.toLocaleString() : 'Invalid Date'}
                   </span>
                 </CardTitle>
                 <CardTitle className="flex justify-between items-center">
@@ -177,7 +178,7 @@ export default function KitchenDashboard() {
                   </div>
                 </div>
                 {isFoodItem(order.kitchenItems[0].itemId) && (
-      <p>This is a food item!</p>
+      <p>This is a food order item by Meja {order.tableNumber} atas nama {order.customerName}</p>
     )}
               </CardContent>
             </Card>

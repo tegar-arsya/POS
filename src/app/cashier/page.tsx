@@ -31,7 +31,7 @@ interface Order {
   barItems: OrderItem[]
   kitchenStatus: string
   barStatus: string
-  createdAt: Date
+  createdAt: Date | null
 }
 
 export default function CashierDashboard() {
@@ -60,7 +60,8 @@ export default function CashierDashboard() {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const ordersData = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate(),
       } as Order))
       setOrders(ordersData)
     })
@@ -229,7 +230,7 @@ export default function CashierDashboard() {
                       <CardTitle className="flex justify-between items-center">
                         <span>Table {order.tableNumber}</span>
                         <span className="text-sm font-normal text-gray-500">
-                        {order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString() : 'Invalid Date'}
+                        {order.createdAt ? order.createdAt.toLocaleString() : 'Invalid Date'}
                         </span>
                       </CardTitle>
                       <CardTitle className="flex justify-between items-center">
