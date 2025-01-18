@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const admin = require('firebase-admin');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const serviceAccount = require('./coffe-shop-1d616-firebase-adminsdk-fbsvc-4fa9b1a2d5.json');
+const serviceAccount = require('./coffe-shop-1d616-firebase-adminsdk-fbsvc-ec570121c4.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -10,14 +10,13 @@ admin.initializeApp({
 const db = admin.firestore();
 
 async function setupFirestore() {
-  // Add sample menu items
+
   const menuItems = [
     { name: "Chicken Sandwich", category: "Main Dish", price: 10.99, description: "Grilled chicken breast with lettuce, tomato, and mayo on a toasted bun", isAvailable: true, preparationTime: 15 },
     { name: "Caesar Salad", category: "Appetizer", price: 8.99, description: "Crisp romaine lettuce, croutons, and parmesan cheese with Caesar dressing", isAvailable: true, preparationTime: 10 },
     { name: "Latte", category: "Hot Drink", price: 4.99, description: "Espresso with steamed milk and a light layer of foam", isAvailable: true, preparationTime: 5 },
     { name: "Iced Americano", category: "Cold Drink", price: 3.99, description: "Espresso shots topped with cold water", isAvailable: true, preparationTime: 3 },
   ];
-
   for (const item of menuItems) {
     await db.collection('menu').add(item);
   }
@@ -55,15 +54,18 @@ async function setupFirestore() {
   // Add a sample order
   const sampleOrder = {
     tableNumber: "3",
-    mainDish: "Chicken Sandwich",
-    drink: "Latte",
-    notes: "Extra mayo on the side",
-    status: "pending",
+    kitchenItems: [
+      { itemId: "chicken_sandwich_id", name: "Chicken Sandwich", quantity: 1, notes: "Extra mayo on the side" }
+    ],
+    barItems: [
+      { itemId: "latte_id", name: "Latte", quantity: 1, notes: "" }
+    ],
+    kitchenStatus: "pending",
+    barStatus: "pending",
     createdAt: admin.firestore.Timestamp.now(),
     updatedAt: admin.firestore.Timestamp.now(),
     totalAmount: 15.98,
     paymentStatus: "unpaid",
-    assignedTo: "kitchen",
   };
 
   await db.collection('orders').add(sampleOrder);
