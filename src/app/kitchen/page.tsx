@@ -23,6 +23,7 @@ interface OrderItem {
 interface Order {
   id: string
   tableNumber: number
+  customerName: string
   kitchenItems: OrderItem[]
   kitchenStatus: string
   createdAt: Date
@@ -120,9 +121,14 @@ export default function KitchenDashboard() {
                     <span>Table {order.tableNumber}</span>
                   </div>
                   <span className="text-sm font-normal text-gray-500">
-                    {new Date(order.createdAt).toLocaleTimeString()}
+                  {order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString() : 'Invalid Date'}
                   </span>
                 </CardTitle>
+                <CardTitle className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <span>Nama Customer : {order.customerName}</span>
+                  </div>
+                  </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-3">

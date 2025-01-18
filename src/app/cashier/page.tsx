@@ -26,6 +26,7 @@ interface OrderItem {
 interface Order {
   id: string
   tableNumber: number
+  customerName: string
   kitchenItems: OrderItem[]
   barItems: OrderItem[]
   kitchenStatus: string
@@ -37,10 +38,12 @@ export default function CashierDashboard() {
   const [orders, setOrders] = useState<Order[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [tableNumber, setTableNumber] = useState('')
+  const [customerName, setCustomerName] = useState('')
   const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([])
   const [selectedItem, setSelectedItem] = useState('')
   const [quantity, setQuantity] = useState('1')
   const [notes, setNotes] = useState('')
+  
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -98,6 +101,7 @@ export default function CashierDashboard() {
       })
       await addDoc(collection(db, 'orders'), {
         tableNumber: parseInt(tableNumber),
+        customerName: customerName,
         kitchenItems,
         barItems,
         kitchenStatus: kitchenItems.length > 0 ? 'pending' : 'not required',
@@ -133,6 +137,13 @@ export default function CashierDashboard() {
                       placeholder="Table Number"
                       value={tableNumber}
                       onChange={(e) => setTableNumber(e.target.value)}
+                      className="border-2 focus:ring-2 focus:ring-amber-500"
+                      required
+                    />
+                     <Input
+                      placeholder="Nama Pembeli"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
                       className="border-2 focus:ring-2 focus:ring-amber-500"
                       required
                     />
@@ -218,7 +229,12 @@ export default function CashierDashboard() {
                       <CardTitle className="flex justify-between items-center">
                         <span>Table {order.tableNumber}</span>
                         <span className="text-sm font-normal text-gray-500">
-                          {new Date(order.createdAt).toLocaleString()}
+                        {order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString() : 'Invalid Date'}
+                        </span>
+                      </CardTitle>
+                      <CardTitle className="flex justify-between items-center">
+                        <span>customerName : {order.customerName}</span>
+                        <span className="text-sm font-normal text-gray-500">
                         </span>
                       </CardTitle>
                     </CardHeader>

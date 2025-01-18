@@ -54,6 +54,7 @@ async function setupFirestore() {
   // Add a sample order
   const sampleOrder = {
     tableNumber: "3",
+    NamaPembeli: "tegar",
     kitchenItems: [
       { itemId: "chicken_sandwich_id", name: "Chicken Sandwich", quantity: 1, notes: "Extra mayo on the side" }
     ],
