@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { PlusCircle, MinusCircle, ClipboardList, Coffee } from 'lucide-react'
+import Link from 'next/link'
 
 interface MenuItem {
   id: string
@@ -94,11 +95,11 @@ export default function CashierDashboard() {
     if (currentOrder.length > 0) {
       const kitchenItems = currentOrder.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.itemId)
-        return menuItem && menuItem.category !== 'Hot Drink' && menuItem.category !== 'Cold Drink'
+        return menuItem && menuItem.category !== 'Hot Drink' && menuItem.category !== 'Cold Drink' && menuItem.category !== 'Minuman' 
       })
       const barItems = currentOrder.filter(item => {
         const menuItem = menuItems.find(mi => mi.id === item.itemId)
-        return menuItem && (menuItem.category === 'Hot Drink' || menuItem.category === 'Cold Drink')
+        return menuItem && (menuItem.category === 'Hot Drink' || menuItem.category === 'Cold Drink' || menuItem.category === 'Minuman')
       })
       await addDoc(collection(db, 'orders'), {
         tableNumber: parseInt(tableNumber),
@@ -120,6 +121,12 @@ export default function CashierDashboard() {
         <div className="flex items-center mb-8 animate-fade-in-down">
           <Coffee className="w-8 h-8 mr-3 text-amber-600" />
           <h1 className="text-4xl font-bold text-gray-800">Cashier Dashboard</h1>
+          <Link
+            href="/menu"
+            className="ml-auto text-white hover:text-amber-800 transition-colors duration-300 bg-red-500 px-4 py-2 rounded-md"
+          >
+            Tambah Menu
+            </Link>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
