@@ -133,8 +133,6 @@ POS Coffee Shop adalah aplikasi manajemen pemesanan untuk coffee shop modern. We
 **Dashboard Bar**  
 ![Dashboard Bar](public/screenshots/bar.png)
 
-**Dashboard Kasir**  
-![Dashboard Kasir](public/screenshots/dashboard-kasir.png)
 
 **Collection Firestore**  
 ![Collection Firestore](public/screenshots/firebase.png)
@@ -173,8 +171,8 @@ Kami sangat terbuka untuk kontribusi! Jika Anda ingin berkontribusi:
 
 Untuk pertanyaan lebih lanjut, silakan hubungi:
 
-- **Email**: support@coffee-shop.com
-- **WhatsApp**: +62 812-3456-7890
+- **Email**: tegararsya0117@gmail.com**
+- **WhatsApp**: +62 81353677822
 
 ---
 
