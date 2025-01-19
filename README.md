@@ -1,6 +1,6 @@
 # POS Coffee Shop
 
-![Logo](https://via.placeholder.com/300x100?text=POS+Coffee+Shop)
+![Logo](https://assets-a1.kompasiana.com/items/album/2024/11/06/coffee-shop-672b964134777c3d3d57c692.jpg)
 
 ## 🚀 Deskripsi Proyek
 
