@@ -92,28 +92,28 @@ POS Coffee Shop adalah aplikasi manajemen pemesanan untuk coffee shop modern. We
 ## ✨ Screenshots
 
 **Halaman Landing Page**  
-![Dashboard Kasir](public/screenshots/landing.png)
+![Dashboard Kasir](public/landing.png)
 
 **Halaman Login**
-![Login](public/screenshots/login.png)
+![Login](public/login.png)
 
 **Dashboard Kasir**  
-![Dashboard Kasir](public/screenshots/kasir.png)
+![Dashboard Kasir](public/kasir.png)
 
 **Kasir Tambah Menu**  
-![Kasir Tambah Menu](public/screenshots/tambahmenu.png)
+![Kasir Tambah Menu](public/tambahmenu.png)
 
 **Dashboard Dapur**  
-![Dashboard Dapur](public/screenshots/dapur.png)
+![Dashboard Dapur](public/dapur.png)
 
 **Dashboard Bar**  
-![Dashboard Bar](public/screenshots/bar.png)
+![Dashboard Bar](public/bar.png)
 
 **Dashboard Kasir**  
-![Dashboard Kasir](public/screenshots/dashboard-kasir.png)
+![Dashboard Kasir](public/dashboard-kasir.png)
 
 **Collection Firestore**  
-![Collection Firestore](public/screenshots/firebase.png)
+![Collection Firestore](public/firebase.png)
 
 ---
 
