@@ -91,8 +91,7 @@ POS Coffee Shop adalah aplikasi manajemen pemesanan untuk coffee shop modern. We
 
 ## ✨ Screenshots
 
-**Halaman Landing Page**  
-<<<<<<< HEAD
+**Halaman Landing Page**
 ![Dashboard Kasir](public/landing.png)
 
 **Halaman Login**
