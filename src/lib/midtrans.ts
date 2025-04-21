@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 interface MidtransConfig {
   serverKey: string;
@@ -68,12 +68,18 @@ export const createSnapTransaction = async (params: TransactionParams) => {
     }
 
     return response.data;
-  } catch (error: any) {
-    console.error('Midtrans transaction error:', {
-      message: error.message,
-      response: error.response?.data,
-      config: error.config,
-    });
-    throw new Error(`Payment failed: ${error.response?.data?.message || error.message}`);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error('Midtrans transaction error:', {
+        message: error.message,
+        response: (error as AxiosError)?.response?.data,
+        config: (error as AxiosError)?.config,
+      });
+      const errorMessage = ((error as AxiosError)?.response?.data as { message?: string })?.message || error.message;
+      throw new Error(`Payment failed: ${errorMessage}`);
+    } else {
+      console.error('Unexpected error:', error);
+      throw new Error('Payment failed due to an unexpected error');
+    }
   }
 };

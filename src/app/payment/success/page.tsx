@@ -12,7 +12,14 @@ export default function PaymentSuccess() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const midtransOrderId = searchParams.get('order_id');
-  const [order, setOrder] = useState<any>(null);
+  interface Order {
+    id: string
+    paymentStatus: string
+    total: number
+    paymentMethod: string
+  }
+
+  const [order, setOrder] = useState<Order[]>([])
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +42,13 @@ export default function PaymentSuccess() {
         if (!querySnapshot.empty) {
           const orderDoc = querySnapshot.docs[0];
           console.log('Found order by midtransOrderId:', orderDoc.id);
-          setOrder({ id: orderDoc.id, ...orderDoc.data() });
+          setOrder([ { 
+            id: orderDoc.id, 
+            paymentStatus: orderDoc.data().paymentStatus, 
+            total: orderDoc.data().total, 
+            paymentMethod: orderDoc.data().paymentMethod, 
+            ...orderDoc.data() 
+          } ]);
           setLoading(false);
           return;
         }
@@ -52,7 +65,7 @@ export default function PaymentSuccess() {
 
         if (orderSnap.exists()) {
           console.log('Found order by Firebase ID fallback');
-          setOrder({ id: orderSnap.id, ...orderSnap.data() });
+          setOrder([{ id: orderSnap.id, ...orderSnap.data() } as Order]);
         } else {
           setError('Order not found in database');
         }
@@ -117,35 +130,35 @@ export default function PaymentSuccess() {
           </svg>
           
           <h2 className="mt-4 text-2xl font-bold text-gray-900">
-            {order.paymentStatus === 'paid' 
-              ? 'Payment Successful!' 
-              : 'Payment Processing'}
+          {order.length > 0 && order[0].paymentStatus === 'paid' 
+  ? 'Payment Successful!' 
+  : 'Payment Processing'}
           </h2>
           
           <div className="mt-6 space-y-4 text-left">
             <div className="flex justify-between">
               <span className="font-medium">Order ID:</span>
-              <span>{order.id}</span>
+              <span>{order.length > 0 ? order[0].id : ''}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Status:</span>
               <span className={`font-semibold ${
-                order.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
+                order.length > 0 && order[0].paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
               }`}>
-                {order.paymentStatus?.toUpperCase()}
+                {order.length > 0 ? order[0].paymentStatus?.toUpperCase() : ''}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Total:</span>
-              <span>Rp {order.total?.toLocaleString('id-ID')}</span>
+              <span>Rp {order.length > 0 ? order[0].total?.toLocaleString('id-ID') : ''}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Method:</span>
               <span>
-                {order.paymentMethod === 'payment_gateway' 
-                  ? 'Payment Gateway' 
-                  : 'Cash'}
-              </span>
+  {order.length > 0 ? (order[0].paymentMethod === 'payment_gateway' 
+    ? 'Payment Gateway' 
+    : 'Cash') : ''}
+</span>
             </div>
           </div>
         </div>
