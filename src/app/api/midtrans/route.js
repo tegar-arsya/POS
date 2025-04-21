@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {
-    const serverKey = process.env.NEXT_PUBLIC_MIDTRANS_SERVER_KEY;
+    const serverKey = process.env.MIDTRANS_SERVER_KEY;
     if (!serverKey) {
       throw new Error('Midtrans server key not configured');
     }
 
-    const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_ENVIRONMENT === 'production';
+    const isProduction = process.env.MIDTRANS_ENVIRONMENT === 'production';
     const baseUrl = isProduction 
       ? 'https://app.midtrans.com' 
       : 'https://app.sandbox.midtrans.com';

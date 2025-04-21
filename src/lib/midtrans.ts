@@ -7,9 +7,9 @@ interface MidtransConfig {
 }
 
 const midtransConfig: MidtransConfig = {
-  serverKey: process.env.NEXT_PUBLIC_MIDTRANS_SERVER_KEY || '',
-  clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '',
-  isProduction: process.env.NEXT_PUBLIC_MIDTRANS_ENVIRONMENT === 'production',
+  serverKey: process.env.MIDTRANS_SERVER_KEY || '',
+  clientKey: process.env.MIDTRANS_CLIENT_KEY || '',
+  isProduction: process.env.MIDTRANS_ENVIRONMENT === 'production',
 };
 
 const getBaseUrl = () => {
