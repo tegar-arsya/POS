@@ -1,25 +1,24 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase'
+import { db } from '@/lib/firebase';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
+interface Order {
+  id: string;
+  paymentStatus: string;
+  total: number;
+  paymentMethod: string;
+  midtransOrderId?: string;
+}
 
-
-export default function PaymentSuccess() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const midtransOrderId = searchParams.get('order_id');
-  interface Order {
-    id: string
-    paymentStatus: string
-    total: number
-    paymentMethod: string
-  }
-
-  const [order, setOrder] = useState<Order[]>([])
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,13 +41,13 @@ export default function PaymentSuccess() {
         if (!querySnapshot.empty) {
           const orderDoc = querySnapshot.docs[0];
           console.log('Found order by midtransOrderId:', orderDoc.id);
-          setOrder([ { 
+          setOrder({ 
             id: orderDoc.id, 
             paymentStatus: orderDoc.data().paymentStatus, 
             total: orderDoc.data().total, 
-            paymentMethod: orderDoc.data().paymentMethod, 
+            paymentMethod: orderDoc.data().paymentMethod,
             ...orderDoc.data() 
-          } ]);
+          });
           setLoading(false);
           return;
         }
@@ -65,7 +64,13 @@ export default function PaymentSuccess() {
 
         if (orderSnap.exists()) {
           console.log('Found order by Firebase ID fallback');
-          setOrder([{ id: orderSnap.id, ...orderSnap.data() } as Order]);
+          setOrder({ 
+            id: orderSnap.id, 
+            paymentStatus: orderSnap.data().paymentStatus, 
+            total: orderSnap.data().total, 
+            paymentMethod: orderSnap.data().paymentMethod,
+            ...orderSnap.data() 
+          });
         } else {
           setError('Order not found in database');
         }
@@ -93,21 +98,21 @@ export default function PaymentSuccess() {
 
   if (error || !order) {
     return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
-            <h2 className="text-2xl font-bold text-red-600">Order Not Found</h2>
-            <p className="mt-4 text-gray-600">{error}</p>
-            <p className="mt-2 text-sm text-gray-500">
-              Order ID: {midtransOrderId}
-            </p>
-            <Button 
-              onClick={() => router.push('/orders')}
-              className="mt-6"
-            >
-              View My Orders
-            </Button>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold text-red-600">Order Not Found</h2>
+          <p className="mt-4 text-gray-600">{error}</p>
+          <p className="mt-2 text-sm text-gray-500">
+            Order ID: {midtransOrderId}
+          </p>
+          <Button 
+            onClick={() => router.push('/orders')}
+            className="mt-6"
+          >
+            View My Orders
+          </Button>
         </div>
+      </div>
     );
   }
 
@@ -130,35 +135,35 @@ export default function PaymentSuccess() {
           </svg>
           
           <h2 className="mt-4 text-2xl font-bold text-gray-900">
-          {order.length > 0 && order[0].paymentStatus === 'paid' 
-  ? 'Payment Successful!' 
-  : 'Payment Processing'}
+            {order.paymentStatus === 'paid' 
+              ? 'Payment Successful!' 
+              : 'Payment Processing'}
           </h2>
           
           <div className="mt-6 space-y-4 text-left">
             <div className="flex justify-between">
               <span className="font-medium">Order ID:</span>
-              <span>{order.length > 0 ? order[0].id : ''}</span>
+              <span>{order.id}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Status:</span>
               <span className={`font-semibold ${
-                order.length > 0 && order[0].paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
+                order.paymentStatus === 'paid' ? 'text-green-600' : 'text-yellow-600'
               }`}>
-                {order.length > 0 ? order[0].paymentStatus?.toUpperCase() : ''}
+                {order.paymentStatus?.toUpperCase()}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Total:</span>
-              <span>Rp {order.length > 0 ? order[0].total?.toLocaleString('id-ID') : ''}</span>
+              <span>Rp {order.total?.toLocaleString('id-ID')}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Method:</span>
               <span>
-  {order.length > 0 ? (order[0].paymentMethod === 'payment_gateway' 
-    ? 'Payment Gateway' 
-    : 'Cash') : ''}
-</span>
+                {order.paymentMethod === 'payment_gateway' 
+                  ? 'Payment Gateway' 
+                  : 'Cash'}
+              </span>
             </div>
           </div>
         </div>
@@ -172,5 +177,20 @@ export default function PaymentSuccess() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4">Loading payment details...</p>
+        </div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
