@@ -21,8 +21,8 @@ async function createUserDocuments() {
     if (!doc.exists) {
       await userRef.set({
         email: user.email,
-        name: user.displayName || '',
-        role: 'cashier', // Set a default role, you may want to adjust this
+        name: user.displayName || 'TG',
+        role: 'admin', // Set a default role, you may want to adjust this
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         lastLogin: admin.firestore.FieldValue.serverTimestamp()
       });

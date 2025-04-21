@@ -39,6 +39,9 @@ export default function LoginPage() {
           case 'bar':
             router.push('/bar')
             break
+          case 'admin':
+            router.push('/admin')
+            break
           default:
             throw new Error('Invalid user role')
         }
