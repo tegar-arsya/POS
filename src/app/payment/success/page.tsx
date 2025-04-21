@@ -35,7 +35,8 @@ function PaymentSuccessContent() {
         }
 
         const ordersRef = collection(db, 'orders');
-        const q = query(ordersRef, where('midtransOrderId', '==', midtransOrderId));
+        const fullMidtransId = `ORDER-${midtransOrderId}-`; // pakai startsWith match
+        const q = query(ordersRef, where('midtransOrderId', '>=', fullMidtransId), where('midtransOrderId', '<', fullMidtransId + '\uf8ff'));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
