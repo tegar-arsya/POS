@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try {
+    console.log("MIDTRANS_SERVER_KEY:", process.env.MIDTRANS_SERVER_KEY);
+    console.log("MIDTRANS_ENVIRONMENT:", process.env.MIDTRANS_ENVIRONMENT);
     const serverKey = process.env.MIDTRANS_SERVER_KEY;
     if (!serverKey) {
       throw new Error('Midtrans server key not configured');
+      console.log("MIDTRANS_SERVER_KEY:", process.env.MIDTRANS_SERVER_KEY);
+
     }
 
     const isProduction = process.env.MIDTRANS_ENVIRONMENT === 'production';

@@ -21,8 +21,11 @@ function PaymentSuccessContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    let pollingTimeout: NodeJS.Timeout;
+
     const fetchOrder = async () => {
       try {
         if (!midtransOrderId) {
@@ -31,59 +34,70 @@ function PaymentSuccessContent() {
           return;
         }
 
-        console.log('Searching for order with midtransOrderId:', midtransOrderId);
-
-        // 1. Cari berdasarkan midtransOrderId terlebih dahulu
         const ordersRef = collection(db, 'orders');
         const q = query(ordersRef, where('midtransOrderId', '==', midtransOrderId));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
           const orderDoc = querySnapshot.docs[0];
-          console.log('Found order by midtransOrderId:', orderDoc.id);
-          setOrder({ 
-            id: orderDoc.id, 
-            paymentStatus: orderDoc.data().paymentStatus, 
-            total: orderDoc.data().total, 
+          const fetchedOrder: Order = {
+            id: orderDoc.id,
+            paymentStatus: orderDoc.data().paymentStatus,
+            total: orderDoc.data().total,
             paymentMethod: orderDoc.data().paymentMethod,
-            ...orderDoc.data() 
-          });
-          setLoading(false);
-          return;
-        }
+            ...orderDoc.data()
+          };
+          setOrder(fetchedOrder);
 
-        // 2. Fallback: Coba ekstrak Firebase ID dari midtransOrderId
-        const firebaseId = midtransOrderId.split('-')[1];
-        if (!firebaseId) {
-          throw new Error('Invalid order ID format');
-        }
-
-        console.log('Trying fallback with Firebase ID:', firebaseId);
-        const orderRef = doc(db, 'orders', firebaseId);
-        const orderSnap = await getDoc(orderRef);
-
-        if (orderSnap.exists()) {
-          console.log('Found order by Firebase ID fallback');
-          setOrder({ 
-            id: orderSnap.id, 
-            paymentStatus: orderSnap.data().paymentStatus, 
-            total: orderSnap.data().total, 
-            paymentMethod: orderSnap.data().paymentMethod,
-            ...orderSnap.data() 
-          });
+          // Stop polling if sudah "paid"
+          if (fetchedOrder.paymentStatus === 'paid' || retryCount >= 5) {
+            setLoading(false);
+            return;
+          }
         } else {
-          setError('Order not found in database');
+          // Fallback: ekstrak Firebase ID dari order_id
+          const firebaseId = midtransOrderId.split('-')[1];
+          const orderRef = doc(db, 'orders', firebaseId);
+          const orderSnap = await getDoc(orderRef);
+
+          if (orderSnap.exists()) {
+            const fallbackOrder: Order = {
+              id: orderSnap.id,
+              paymentStatus: orderSnap.data().paymentStatus,
+              total: orderSnap.data().total,
+              paymentMethod: orderSnap.data().paymentMethod,
+              ...orderSnap.data()
+            };
+            setOrder(fallbackOrder);
+            if (fallbackOrder.paymentStatus === 'paid' || retryCount >= 5) {
+              setLoading(false);
+              return;
+            }
+          } else {
+            setError('Order not found in database');
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Retry polling kalau belum "paid"
+        if (retryCount < 5) {
+          setRetryCount(retryCount + 1);
+          pollingTimeout = setTimeout(fetchOrder, 2000); // 2 detik
+        } else {
+          setLoading(false);
         }
       } catch (err) {
         console.error('Error fetching order:', err);
         setError('Failed to load order details');
-      } finally {
         setLoading(false);
       }
     };
 
     fetchOrder();
-  }, [midtransOrderId]);
+
+    return () => clearTimeout(pollingTimeout);
+  }, [midtransOrderId, retryCount]);
 
   if (loading) {
     return (
@@ -120,26 +134,44 @@ function PaymentSuccessContent() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
         <div className="text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-green-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-          
+          {order.paymentStatus === 'paid' ? (
+            <svg
+              className="mx-auto h-12 w-12 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          ) : (
+            <div className="animate-pulse">
+              <svg
+                className="mx-auto h-12 w-12 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m0-4h.01M12 20h.01"
+                />
+              </svg>
+            </div>
+          )}
+
           <h2 className="mt-4 text-2xl font-bold text-gray-900">
             {order.paymentStatus === 'paid' 
               ? 'Payment Successful!' 
-              : 'Payment Processing'}
+              : 'Menunggu Konfirmasi Pembayaran…'}
           </h2>
-          
+
           <div className="mt-6 space-y-4 text-left">
             <div className="flex justify-between">
               <span className="font-medium">Order ID:</span>
@@ -167,7 +199,7 @@ function PaymentSuccessContent() {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-8">
           <Link href="/cashier" passHref>
             <Button className="w-full bg-green-600 hover:bg-green-700">
