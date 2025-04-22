@@ -71,7 +71,7 @@ export default function Home() {
                   </Button>
                 </Link>
 
-                <Link href="/register" className="w-full sm:w-auto">
+                {/* <Link href="/register" className="w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="lg"
@@ -80,7 +80,7 @@ export default function Home() {
                     <User className="w-5 h-5 mr-2" />
                     Create Account
                   </Button>
-                </Link>
+                </Link> */}
               </div>
             </div>
           </div>
